@@ -58,6 +58,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleComponentsVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleComponentsVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleComponentsVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleComponentsVersion"
 
     // Kotlin components
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10"
