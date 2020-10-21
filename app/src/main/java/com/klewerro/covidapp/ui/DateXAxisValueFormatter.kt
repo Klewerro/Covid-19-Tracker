@@ -10,13 +10,8 @@ import kotlin.math.roundToInt
 class DateXAxisValueFormatter(private val values: List<Date>) : ValueFormatter() {
 
     override fun getFormattedValue(value: Float): String {
-        return super.getFormattedValue(value)
-    }
-
-    override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-        //return super.getAxisLabel(value, axis)
         val date = values[value.roundToInt()]
-        val formatter = SimpleDateFormat("dd.MM.yyy")
+        val formatter = SimpleDateFormat("dd.MM")
         val formattedDate = formatter.format(date)
         return formattedDate
     }
