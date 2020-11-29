@@ -7,7 +7,6 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import com.klewerro.covidapp.R
-import com.klewerro.covidapp.model.CountryData
 
 class CustomMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {
 

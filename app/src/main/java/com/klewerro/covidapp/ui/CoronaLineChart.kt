@@ -11,7 +11,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.klewerro.covidapp.R
-import com.klewerro.covidapp.model.CountryData
+import com.klewerro.covidapp.data.model.TimelineData
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,7 +40,7 @@ class CoronaLineChart(context: Context, attrs: AttributeSet) : LineChart(context
         setupOnClickMarker()
     }
 
-    fun setLineDataSet(timelineDataList: List<CountryData.TimelineData>) {
+    fun setLineDataSet(timelineDataList: List<TimelineData>) {
         addIdToTimelineData(timelineDataList)
         val entries = timelineDataList.map { Entry(it.id.toFloat(), it.confirmed.toFloat()) }
         val lineDataSet1 = LineDataSet(entries, "Confirmed cases")  // it.confirmed
@@ -85,7 +85,7 @@ class CoronaLineChart(context: Context, attrs: AttributeSet) : LineChart(context
         this.marker = mv
     }
 
-    private fun addIdToTimelineData(timelineData: List<CountryData.TimelineData>) {
+    private fun addIdToTimelineData(timelineData: List<TimelineData>) {
         for ((i, data) in timelineData.withIndex()) {
             data.id = i
         }

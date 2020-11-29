@@ -1,8 +1,7 @@
 package com.klewerro.covidapp.api
 
-import androidx.lifecycle.LiveData
-import com.klewerro.covidapp.model.CountryData
+import com.klewerro.covidapp.data.model.CountryDataResponse
 
 data class CoronaResponse(
-        val data: CountryData
+        val data: CountryDataResponse
 )

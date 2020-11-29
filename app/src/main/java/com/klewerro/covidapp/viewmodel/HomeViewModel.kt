@@ -1,33 +1,50 @@
 package com.klewerro.covidapp.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
-import com.klewerro.covidapp.api.CovidApi
-import com.klewerro.covidapp.data.CovidRepository
-import com.klewerro.covidapp.model.CountryData
+import com.klewerro.covidapp.data.repository.CovidRepository
+import com.klewerro.covidapp.data.model.CountryDataWithTimeline
+import com.klewerro.covidapp.util.SharedPreferencesHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 import java.util.*
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = CovidRepository()
+    private val repository = CovidRepository(application.baseContext)
+    private val sharedPreferencesHelper = SharedPreferencesHelper.getInstance(application)
+    private val refreshTime = 5 * 60 * 1000 * 1000 * 1000L  // 5 minutes
+    private var lastUpdateTime: Long = 0
 
-    var countryData: LiveData<CountryData>
+    var countryDataWithTimeline: LiveData<CountryDataWithTimeline>
+
 
     init {
-        countryData = getCountryData("PL")
+        countryDataWithTimeline = getCountryDataWithTimeline("PL")
     }
 
 
-    fun getCountryData(countryCode: String): LiveData<CountryData> {
-        return liveData(Dispatchers.IO) {
+    fun getCountryDataWithTimeline(countryCode: String): LiveData<CountryDataWithTimeline> = liveData(
+        Dispatchers.IO
+    ) {
+        if (checkIsTimeForFetch()) {
             val data = repository.getCountryData("PL")
-            val countryData = data.data
-            emit(countryData)
+            sharedPreferencesHelper.saveFetchTime(System.nanoTime())
+            emit(data)
+            showToast("Data from API.")
+        } else {
+            val data = repository.getCountryDataOffline().last()
+            emit(data)
+            showToast("Data from database.")
         }
+    }
+
+
+    private fun checkIsTimeForFetch(): Boolean {
+        val currentTime = System.nanoTime()
+        lastUpdateTime = sharedPreferencesHelper.getFetchTime()
+        return currentTime - lastUpdateTime > refreshTime
     }
 }
