@@ -7,27 +7,26 @@ import java.util.*
 @Entity(tableName = "country_data")
 data class CountryData(
         @PrimaryKey(autoGenerate = true)
-        val id: Long,
+        override val id: Long,
 
-        val name: String,
+        override val name: String,
 
-        val code: String,
+        override val code: String,
 
-        val population: Long,
+        override val population: Long,
 
         @SerializedName("updated_at")
         @ColumnInfo(name = "updated_at")
-        val updatedAt: Date,
+        override val updatedAt: Date,
 
         @SerializedName("today")
         @Embedded(prefix = "today_")
-        val todayStatistic: TodayStatistic,
+        override val todayStatistic: TodayStatistic,
 
         @SerializedName("latest_data")
         @Embedded(prefix = "latest_")
-        val latestData: LatestData,
-        //@SerializedName("timelineData") val timelineData: List<TimelineData>?
-) {
+        override val latestData: LatestData,
+) : CountryDataAbstract() {
         constructor(countryDataResponse: CountryDataResponse) : this(
                 countryDataResponse.id,
                 countryDataResponse.name,
@@ -96,15 +95,15 @@ data class TimelineData(
         @ColumnInfo(name = "recovered_vs_death_ratio")
         val updatedAt: Date,
 
-        val date: Date,
+        override val date: Date,
 
-        val deaths: Int,
+        override val deaths: Int,
 
-        val confirmed: Int,
+        override val confirmed: Int,
 
-        val active: Int,
+        override val active: Int,
 
-        val recovered: Int,
+        override val recovered: Int,
 
         @SerializedName("new_confirmed")
         @ColumnInfo(name = "new_confirmed")
@@ -124,5 +123,5 @@ data class TimelineData(
 
         var countryDataId: Long,
 
-        var id: Int
-)
+        override var id: Int
+) : TimelineAbstract()

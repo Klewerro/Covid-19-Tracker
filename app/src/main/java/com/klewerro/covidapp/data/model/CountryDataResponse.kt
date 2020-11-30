@@ -4,23 +4,23 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class CountryDataResponse(
-    val id: Long,
+    override val id: Long,
 
-    val name: String,
+    override val name: String,
 
-    val code: String,
+    override val code: String,
 
-    val population: Long,
+    override val population: Long,
 
     @SerializedName("updated_at")
-    val updatedAt: Date,
+    override val updatedAt: Date,
 
     @SerializedName("today")
-    val todayStatistic: CountryData.TodayStatistic,
+    override val todayStatistic: CountryData.TodayStatistic,
 
     @SerializedName("latest_data")
-    val latestData: CountryData.LatestData,
+    override val latestData: CountryData.LatestData,
 
     @SerializedName("timeline")
     val timelineData: List<TimelineData>
-)
+) : CountryDataAbstract()
