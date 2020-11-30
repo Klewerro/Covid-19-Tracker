@@ -6,6 +6,10 @@ import com.klewerro.covidapp.api.CovidApi
 import com.klewerro.covidapp.data.database.CovidDatabase
 import com.klewerro.covidapp.data.database.dao.CountryDataDao
 import com.klewerro.covidapp.data.database.dao.TimelineDataDao
+import com.klewerro.covidapp.data.repository.CovidRepositoryImpl
+import com.klewerro.covidapp.data.repository.CovidRepository
+import com.klewerro.covidapp.util.SharedPreferencesHelper
+import com.klewerro.covidapp.util.SharedPreferencesHelperImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,15 +36,31 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCovidDatabase(@ApplicationContext appContext: Context): CovidDatabase = Room.databaseBuilder(
-        appContext,
-        CovidDatabase::class.java,
-        "covid_database"
-    ).build()
+    fun provideCovidDatabase(@ApplicationContext appContext: Context): CovidDatabase =
+        Room.databaseBuilder(
+            appContext,
+            CovidDatabase::class.java,
+            "covid_database"
+        ).build()
 
     @Provides
-    fun provideCountryDataDao(covidDatabase: CovidDatabase): CountryDataDao = covidDatabase.countryDataDao()
+    fun provideCountryDataDao(covidDatabase: CovidDatabase): CountryDataDao =
+        covidDatabase.countryDataDao()
 
     @Provides
-    fun provideTimelineDataDao(covidDatabase: CovidDatabase): TimelineDataDao = covidDatabase.timelineDataDao()
+    fun provideTimelineDataDao(covidDatabase: CovidDatabase): TimelineDataDao =
+        covidDatabase.timelineDataDao()
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferencesHelper(@ApplicationContext appContext: Context) =
+        SharedPreferencesHelperImpl(appContext) as SharedPreferencesHelper
+
+    @Provides
+    @Singleton
+    fun provideCovidRepository(
+        covidApi: CovidApi,
+        countryDataDao: CountryDataDao,
+        timelineDataDao: TimelineDataDao
+    ) = CovidRepositoryImpl(covidApi, countryDataDao, timelineDataDao) as CovidRepository
 }
