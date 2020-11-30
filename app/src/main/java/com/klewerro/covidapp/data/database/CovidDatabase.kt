@@ -19,30 +19,4 @@ abstract class CovidDatabase : RoomDatabase() {
 
     abstract fun countryDataDao(): CountryDataDao
     abstract fun timelineDataDao(): TimelineDataDao
-
-
-    companion object {
-        @Volatile
-        private var _instance: CovidDatabase? = null
-
-        fun getDatabase(context: Context): CovidDatabase {
-            val tempInstance = _instance
-            tempInstance?.let {
-                return it
-            }
-
-            synchronized(this) {
-                val instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        CovidDatabase::class.java,
-                        "covid_database"
-                ).build()
-
-                _instance = instance
-                return instance
-            }
-
-        }
-    }
-
 }

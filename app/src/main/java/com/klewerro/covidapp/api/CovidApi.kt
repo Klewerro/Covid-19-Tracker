@@ -15,11 +15,5 @@ interface CovidApi {
 
     companion object {
         const val BASE_URL = "https://corona-api.com/"
-
-        fun getCovidApi(): CovidApi = Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(CovidApi::class.java)
     }
 }

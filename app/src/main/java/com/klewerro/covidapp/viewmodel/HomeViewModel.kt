@@ -1,6 +1,7 @@
 package com.klewerro.covidapp.viewmodel
 
 import android.app.Application
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.klewerro.covidapp.data.repository.CovidRepository
 import com.klewerro.covidapp.data.model.CountryDataWithTimeline
@@ -12,9 +13,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel @ViewModelInject constructor(
+    private val repository: CovidRepository,
+    application: Application
+) : AndroidViewModel(application) {
 
-    private val repository = CovidRepository(application.baseContext)
     private val sharedPreferencesHelper = SharedPreferencesHelper.getInstance(application)
     private val refreshTime = 5 * 60 * 1000 * 1000 * 1000L  // 5 minutes
     private var lastUpdateTime: Long = 0
