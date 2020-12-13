@@ -2,6 +2,11 @@ package com.klewerro.covidapp.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.klewerro.covidapp.R
@@ -29,6 +34,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         viewModel.dailyTimelineData.observe(viewLifecycleOwner) {dailyTimelineData ->
             chartDaily.setLineDataSet(dailyTimelineData.reversed())
+        }
+
+
+        viewModel.countries.observe(viewLifecycleOwner) {countries ->
+            countriesSpinner.adapter = ArrayAdapter(requireContext(),
+                R.layout.support_simple_spinner_dropdown_item,
+                countries.map { it.name })
         }
     }
 }

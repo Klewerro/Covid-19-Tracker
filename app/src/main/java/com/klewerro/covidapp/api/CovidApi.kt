@@ -12,6 +12,8 @@ interface CovidApi {
     @GET("countries/{country_code}")
     suspend fun getCountryData(@Path("country_code") countryCode: String): CoronaResponse
 
+    @GET("countries")
+    suspend fun getCountryList(): CountryListResponse
 
     companion object {
         const val BASE_URL = "https://corona-api.com/"

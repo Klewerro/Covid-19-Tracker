@@ -3,6 +3,9 @@ package com.klewerro.covidapp.viewmodel
 import android.app.Application
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.klewerro.covidapp.data.model.Country
 import com.klewerro.covidapp.data.model.CountryDataWithTimeline
 import com.klewerro.covidapp.data.model.DailyTimelineData
 import com.klewerro.covidapp.data.model.TimelineData
@@ -14,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
+
 class HomeViewModel @ViewModelInject constructor(
     private val repository: CovidRepository,
     private val sharedPreferencesHelper: SharedPreferencesHelper
@@ -23,10 +27,12 @@ class HomeViewModel @ViewModelInject constructor(
     private var lastUpdateTime: Long = 0
 
     var countryDataWithTimeline: LiveData<CountryDataWithTimeline>
+    var countries: LiveData<List<Country>>
     var dailyTimelineData: MutableLiveData<List<DailyTimelineData>>
 
     init {
         countryDataWithTimeline = getCountryDataWithTimeline("PL")
+        countries = getCountryList()
         dailyTimelineData = MutableLiveData()
     }
 
@@ -49,6 +55,11 @@ class HomeViewModel @ViewModelInject constructor(
             getDailyCasesFromTimelineData(data.timelineData)
         }
 
+
+
+    fun getCountryList() = liveData<List<Country>>(Dispatchers.IO) {
+        emit(repository.getCountryList())
+    }
 
     private fun checkIsTimeForFetch(): Boolean {
         val currentTime = System.nanoTime()

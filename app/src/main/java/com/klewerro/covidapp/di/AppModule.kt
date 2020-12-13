@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.klewerro.covidapp.api.CovidApi
 import com.klewerro.covidapp.data.database.CovidDatabase
+import com.klewerro.covidapp.data.database.dao.CountryDao
 import com.klewerro.covidapp.data.database.dao.CountryDataDao
 import com.klewerro.covidapp.data.database.dao.TimelineDataDao
 import com.klewerro.covidapp.data.repository.CovidRepositoryImpl
@@ -52,6 +53,10 @@ object AppModule {
         covidDatabase.timelineDataDao()
 
     @Provides
+    fun provideCountryDao(covidDatabase: CovidDatabase): CountryDao =
+        covidDatabase.countryDao()
+
+    @Provides
     @Singleton
     fun provideSharedPreferencesHelper(@ApplicationContext appContext: Context) =
         SharedPreferencesHelperImpl(appContext) as SharedPreferencesHelper
@@ -61,6 +66,7 @@ object AppModule {
     fun provideCovidRepository(
         covidApi: CovidApi,
         countryDataDao: CountryDataDao,
-        timelineDataDao: TimelineDataDao
-    ) = CovidRepositoryImpl(covidApi, countryDataDao, timelineDataDao) as CovidRepository
+        timelineDataDao: TimelineDataDao,
+        countryDao: CountryDao
+    ) = CovidRepositoryImpl(covidApi, countryDataDao, timelineDataDao, countryDao) as CovidRepository
 }

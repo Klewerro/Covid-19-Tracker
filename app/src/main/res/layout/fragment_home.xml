@@ -56,6 +56,16 @@
             app:layout_constraintTop_toBottomOf="@+id/confirmedTextView"
             tools:text="138" />
 
+        <Spinner
+            android:id="@+id/countriesSpinner"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:gravity="end"
+            android:spinnerMode="dialog"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/countryTextView"
+            tools:listitem="@layout/support_simple_spinner_dropdown_item" />
+
         <com.klewerro.covidapp.ui.CoronaLineChart
             android:id="@+id/chart"
             android:layout_width="match_parent"
