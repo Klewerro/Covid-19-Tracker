@@ -38,14 +38,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             chartDaily.setLineDataSet(dailyTimelineData.reversed())
         }
 
-        viewModel.countryCode.observe(viewLifecycleOwner) {countryCode ->
-            Toast.makeText(requireContext(), countryCode, Toast.LENGTH_LONG).show()
-        }
-
         viewModel.countries.observe(viewLifecycleOwner) {countries ->
             countriesSpinner.adapter = ArrayAdapter(requireContext(),
                 R.layout.support_simple_spinner_dropdown_item,
                 countries.map { it.name })
+        }
+
+        viewModel.country.observe(viewLifecycleOwner) { country ->
+            if (country != null) {
+                val index = viewModel.countries.value!!.indexOfFirst { it.name == country.name }
+                countriesSpinner.setSelection(index)
+                showToast("Determined country: ${country.name}")
+            }
         }
     }
 

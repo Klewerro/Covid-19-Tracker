@@ -13,4 +13,10 @@ interface CountryDao {
 
     @Query("SELECT * from country")
     suspend fun getCountries(): List<Country>
+
+    @Query("Select * from country where code LIKE :countryCode")
+    suspend fun getCountry(countryCode: String): Country
+
+    @Query("Select * from country where id = :id")
+    suspend fun getCountry(id: Int): Country
 }

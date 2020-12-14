@@ -45,4 +45,10 @@ class CovidRepositoryImpl @Inject constructor(
             countryList
         }
     }
+
+    override suspend fun getCountry(countryCode: String): Country =
+        countryDao.getCountry(countryCode)
+
+    override suspend fun getCountry(id: Int): Country =
+        countryDao.getCountry(id)
 }

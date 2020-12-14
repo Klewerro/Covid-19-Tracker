@@ -14,10 +14,17 @@ class SharedPreferencesHelperImpl @Inject constructor(context: Context) : Shared
         .putLong(PREF_FETCH_TIME, timeInNanoseconds)
         .apply()
 
-    override fun getFetchTime(): Long = prefs.getLong(PREF_FETCH_TIME, -1)
+    override fun getFetchTime() = prefs.getLong(PREF_FETCH_TIME, -1)
+
+    override fun saveCountryId(countryId: Int) = prefs.edit()
+        .putInt(PREF_COUNTRY_ID, countryId)
+        .apply()
+
+    override fun getCountryId() = prefs.getInt(PREF_COUNTRY_ID, -1)
 
 
     companion object {
         private const val PREF_FETCH_TIME = "${BuildConfig.APPLICATION_ID}_pref_time"
+        private const val PREF_COUNTRY_ID = "${BuildConfig.APPLICATION_ID}_pref_country_id"
     }
 }

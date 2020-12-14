@@ -4,10 +4,14 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.klewerro.covidapp.R
 
+
+fun Fragment.showToast(message: String) =
+    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
 
 fun Fragment.checkPermissions(permission: String, successFunction: () -> Unit) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -32,13 +32,13 @@ class HomeViewModel @ViewModelInject constructor(
     var countryDataWithTimeline: LiveData<CountryDataWithTimeline>
     var countries: LiveData<List<Country>>
     var dailyTimelineData: MutableLiveData<List<DailyTimelineData>>
-    var countryCode: MutableLiveData<String>
+    var country: MutableLiveData<Country>
 
     init {
         countryDataWithTimeline = getCountryDataWithTimeline("PL")
         countries = getCountryList()
         dailyTimelineData = MutableLiveData()
-        countryCode = MutableLiveData() //Change to SharedPreferencesImpl
+        country = MutableLiveData()
     }
 
 
@@ -64,6 +64,10 @@ class HomeViewModel @ViewModelInject constructor(
 
     fun getCountryList() = liveData<List<Country>>(Dispatchers.IO) {
         emit(repository.getCountryList())
+        val country = repository.getCountry(sharedPreferencesHelper.getCountryId());
+        withContext(Dispatchers.Main) {
+            this@HomeViewModel.country.value = country
+        }
     }
 
     fun testCall(countryCode: String) {
@@ -74,7 +78,11 @@ class HomeViewModel @ViewModelInject constructor(
     fun getCountryCode(context: Context) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         fusedLocationClient.lastLocation.addOnSuccessListener { position ->
-            countryCode.value = getCountryCodeFromLocation(context, Pair(position.latitude, position.longitude))
+            val countryCode = getCountryCodeFromLocation(context, Pair(position.latitude, position.longitude))
+
+            viewModelScope.launch (Dispatchers.IO) {
+                findCountryFromCode(countryCode)
+            }
         }
     }
 
@@ -113,5 +121,14 @@ class HomeViewModel @ViewModelInject constructor(
         val myLocation = Geocoder(context)
         val list = myLocation.getFromLocation(latLang.first, latLang.second, 3)
         return list[0].countryCode
+    }
+
+    private suspend fun findCountryFromCode(countryCode: String) {
+        val country = repository.getCountry(countryCode)
+
+        sharedPreferencesHelper.saveCountryId(country.id)
+        withContext(Dispatchers.Main) {
+            this@HomeViewModel.country.value = country
+        }
     }
 }
