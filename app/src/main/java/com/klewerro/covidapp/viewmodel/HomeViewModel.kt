@@ -1,6 +1,8 @@
 package com.klewerro.covidapp.viewmodel
 
 import android.app.Application
+import android.content.Context
+import android.location.Geocoder
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -25,15 +27,18 @@ class HomeViewModel @ViewModelInject constructor(
 
     private val refreshTime = 5 * 60 * 1000 * 1000 * 1000L  // 5 minutes
     private var lastUpdateTime: Long = 0
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     var countryDataWithTimeline: LiveData<CountryDataWithTimeline>
     var countries: LiveData<List<Country>>
     var dailyTimelineData: MutableLiveData<List<DailyTimelineData>>
+    var countryCode: MutableLiveData<String>
 
     init {
         countryDataWithTimeline = getCountryDataWithTimeline("PL")
         countries = getCountryList()
         dailyTimelineData = MutableLiveData()
+        countryCode = MutableLiveData() //Change to SharedPreferencesImpl
     }
 
 
@@ -61,6 +66,19 @@ class HomeViewModel @ViewModelInject constructor(
         emit(repository.getCountryList())
     }
 
+    fun testCall(countryCode: String) {
+        countryDataWithTimeline = getCountryDataWithTimeline(countryCode)
+       // countryDataWithTimeline.
+    }
+
+    fun getCountryCode(context: Context) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        fusedLocationClient.lastLocation.addOnSuccessListener { position ->
+            countryCode.value = getCountryCodeFromLocation(context, Pair(position.latitude, position.longitude))
+        }
+    }
+
+
     private fun checkIsTimeForFetch(): Boolean {
         val currentTime = System.nanoTime()
         lastUpdateTime = sharedPreferencesHelper.getFetchTime()
@@ -87,5 +105,13 @@ class HomeViewModel @ViewModelInject constructor(
                 dailyTimelineData.value = data
             }
         }
+    }
+
+    private fun getCountryCodeFromLocation(context: Context, latLang: Pair<Double, Double>): String  {  //Todo: add position
+        val test = context.resources.configuration.locales
+
+        val myLocation = Geocoder(context)
+        val list = myLocation.getFromLocation(latLang.first, latLang.second, 3)
+        return list[0].countryCode
     }
 }
