@@ -4,9 +4,9 @@ import com.klewerro.covidapp.api.CovidApi
 import com.klewerro.covidapp.data.database.dao.CountryDao
 import com.klewerro.covidapp.data.database.dao.CountryDataDao
 import com.klewerro.covidapp.data.database.dao.TimelineDataDao
-import com.klewerro.covidapp.data.model.Country
-import com.klewerro.covidapp.data.model.CountryData
-import com.klewerro.covidapp.data.model.CountryDataWithTimeline
+import com.klewerro.covidapp.data.entity.Country
+import com.klewerro.covidapp.data.entity.CountryData
+import com.klewerro.covidapp.data.entity.CountryDataWithTimeline
 import javax.inject.Inject
 
 class CovidRepositoryImpl @Inject constructor(
@@ -17,7 +17,7 @@ class CovidRepositoryImpl @Inject constructor(
     ) : CovidRepository {
 
     override suspend fun getCountryData(countryCode: String): CountryDataWithTimeline {
-        val response = covidApi.getCountryData(countryCode);
+        val response = covidApi.getCountryData(countryCode)
         val countryData = CountryData(response.data)
 
         val countryDataWithTimeline = CountryDataWithTimeline(countryData, response.data.timelineData)
@@ -30,7 +30,7 @@ class CovidRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCountryDataOffline(): List<CountryDataWithTimeline>
-        = countryDataDao.getAllCountryData();
+        = countryDataDao.getAllCountryData()
 
     override suspend fun getCountryList(): List<Country> {
         var countryList: List<Country>

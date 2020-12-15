@@ -1,7 +1,7 @@
 package com.klewerro.covidapp.data.repository
 
-import com.klewerro.covidapp.data.model.Country
-import com.klewerro.covidapp.data.model.CountryDataWithTimeline
+import com.klewerro.covidapp.data.entity.Country
+import com.klewerro.covidapp.data.entity.CountryDataWithTimeline
 
 interface CovidRepository {
     suspend fun getCountryData(countryCode: String): CountryDataWithTimeline

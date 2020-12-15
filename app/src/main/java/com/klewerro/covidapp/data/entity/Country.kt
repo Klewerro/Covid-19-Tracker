@@ -1,4 +1,4 @@
-package com.klewerro.covidapp.data.model
+package com.klewerro.covidapp.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,4 +1,4 @@
-package com.klewerro.covidapp.ui
+package com.klewerro.covidapp.ui.Home
 
 import android.content.Context
 import android.util.AttributeSet
@@ -11,9 +11,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.klewerro.covidapp.R
-import com.klewerro.covidapp.data.model.DailyTimelineData
 import com.klewerro.covidapp.data.model.TimelineAbstract
-import com.klewerro.covidapp.data.model.TimelineData
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*

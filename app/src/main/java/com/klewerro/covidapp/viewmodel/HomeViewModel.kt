@@ -7,13 +7,12 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.klewerro.covidapp.data.model.Country
-import com.klewerro.covidapp.data.model.CountryDataWithTimeline
+import com.klewerro.covidapp.data.entity.Country
+import com.klewerro.covidapp.data.entity.CountryDataWithTimeline
 import com.klewerro.covidapp.data.model.DailyTimelineData
-import com.klewerro.covidapp.data.model.TimelineData
+import com.klewerro.covidapp.data.entity.TimelineData
 import com.klewerro.covidapp.data.repository.CovidRepository
 import com.klewerro.covidapp.util.SharedPreferencesHelper
-import com.klewerro.covidapp.util.SharedPreferencesHelperImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,7 +71,6 @@ class HomeViewModel @ViewModelInject constructor(
 
     fun testCall(countryCode: String) {
         countryDataWithTimeline = getCountryDataWithTimeline(countryCode)
-       // countryDataWithTimeline.
     }
 
     fun getCountryCode(context: Context) {

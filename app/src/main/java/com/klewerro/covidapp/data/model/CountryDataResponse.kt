@@ -1,6 +1,8 @@
 package com.klewerro.covidapp.data.model
 
 import com.google.gson.annotations.SerializedName
+import com.klewerro.covidapp.data.entity.CountryData
+import com.klewerro.covidapp.data.entity.TimelineData
 import java.util.*
 
 data class CountryDataResponse(

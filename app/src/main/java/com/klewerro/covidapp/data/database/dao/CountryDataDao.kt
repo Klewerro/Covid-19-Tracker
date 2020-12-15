@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import com.klewerro.covidapp.data.model.CountryData
-import com.klewerro.covidapp.data.model.CountryDataWithTimeline
+import com.klewerro.covidapp.data.entity.CountryData
+import com.klewerro.covidapp.data.entity.CountryDataWithTimeline
 
 @Dao
 interface CountryDataDao {

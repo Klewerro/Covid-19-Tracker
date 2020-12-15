@@ -1,4 +1,4 @@
-package com.klewerro.covidapp.ui
+package com.klewerro.covidapp.ui.Home
 
 import android.content.Context
 import android.widget.TextView
@@ -21,6 +21,6 @@ class CustomMarkerView(context: Context, layoutResource: Int) : MarkerView(conte
     }
 
     override fun getOffset(): MPPointF {
-        return MPPointF(-(width / 2).toFloat(), -height.toFloat());
+        return MPPointF(-(width / 2).toFloat(), -height.toFloat())
     }
 }

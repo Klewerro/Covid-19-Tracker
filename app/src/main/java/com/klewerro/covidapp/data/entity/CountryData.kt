@@ -1,7 +1,10 @@
-package com.klewerro.covidapp.data.model
+package com.klewerro.covidapp.data.entity
 
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
+import com.klewerro.covidapp.data.model.CountryDataAbstract
+import com.klewerro.covidapp.data.model.CountryDataResponse
+import com.klewerro.covidapp.data.model.TimelineAbstract
 import java.util.*
 
 @Entity(tableName = "country_data")

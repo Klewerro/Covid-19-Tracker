@@ -1,4 +1,4 @@
-package com.klewerro.covidapp.ui
+package com.klewerro.covidapp.ui.Home
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -8,10 +8,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.klewerro.covidapp.R
+import com.klewerro.covidapp.ui.checkPermissions
+import com.klewerro.covidapp.ui.showToast
 import com.klewerro.covidapp.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*

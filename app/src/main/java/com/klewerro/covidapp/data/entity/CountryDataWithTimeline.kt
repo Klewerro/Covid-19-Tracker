@@ -1,4 +1,4 @@
-package com.klewerro.covidapp.data.model
+package com.klewerro.covidapp.data.entity
 
 import androidx.room.Embedded
 import androidx.room.Relation

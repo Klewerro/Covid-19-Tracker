@@ -1,6 +1,6 @@
 package com.klewerro.covidapp.data.model
 
-import com.google.gson.annotations.SerializedName
+import com.klewerro.covidapp.data.entity.CountryData
 import java.util.*
 
 abstract class CountryDataAbstract() {
