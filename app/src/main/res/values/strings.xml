@@ -4,4 +4,6 @@
     <string name="location_permission_required_description">Permission to access your location is required to determine your country.</string>
     <string name="permission_required">Permission required</string>
     <string name="other_permission_required_description">Permission required for the proper application working.</string>
+    <string name="determine_your_country">Determine your country</string>
+    <string name="determine_country_from_phone_settings">Determine country from phone settings</string>
 </resources>

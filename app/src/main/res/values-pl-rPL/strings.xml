@@ -5,4 +5,6 @@
     <string name="location_permission_required_description">Uprawnienie do lokalizacji jest wymagane do ustalenia kraju w którym się znajdujesz.</string>
     <string name="permission_required">Wymagane uprawnienie</string>
     <string name="other_permission_required_description">Uprawnienie wymagane do poprawnego działania aplikacji.</string>
+    <string name="determine_your_country">Ustal swój kraj</string>
+    <string name="determine_country_from_phone_settings">Ustal swój kraj z ustawień telefonu</string>
 </resources>

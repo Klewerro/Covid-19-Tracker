@@ -59,11 +59,9 @@ class HomeViewModel @ViewModelInject constructor(
             getDailyCasesFromTimelineData(data.timelineData)
         }
 
-
-
     fun getCountryList() = liveData<List<Country>>(Dispatchers.IO) {
         emit(repository.getCountryList())
-        val country = repository.getCountry(sharedPreferencesHelper.getCountryId());
+        val country = repository.getCountry(sharedPreferencesHelper.getCountryId())
         withContext(Dispatchers.Main) {
             this@HomeViewModel.country.value = country
         }
@@ -81,6 +79,14 @@ class HomeViewModel @ViewModelInject constructor(
             viewModelScope.launch (Dispatchers.IO) {
                 findCountryFromCode(countryCode)
             }
+        }
+    }
+
+    fun getCountryCodeFromPhoneSettings(context: Context) {
+        val locales = context.resources.configuration.locales
+        val tag = locales[0].country
+        viewModelScope.launch(Dispatchers.IO) {
+            findCountryFromCode(tag)
         }
     }
 
@@ -114,8 +120,6 @@ class HomeViewModel @ViewModelInject constructor(
     }
 
     private fun getCountryCodeFromLocation(context: Context, latLang: Pair<Double, Double>): String  {  //Todo: add position
-        val test = context.resources.configuration.locales
-
         val myLocation = Geocoder(context)
         val list = myLocation.getFromLocation(latLang.first, latLang.second, 3)
         return list[0].countryCode

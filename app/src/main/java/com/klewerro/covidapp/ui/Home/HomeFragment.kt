@@ -59,8 +59,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_location) {
-            checkPermissions(Manifest.permission.ACCESS_FINE_LOCATION) { viewModel.getCountryCode(requireContext()) }
+        when(item.itemId) {
+            R.id.menu_location -> checkPermissions(Manifest.permission.ACCESS_FINE_LOCATION) {
+                viewModel.getCountryCode(requireContext())
+            }
+            R.id.menu_location_settings -> viewModel.getCountryCodeFromPhoneSettings(requireContext())
         }
 
         return super.onOptionsItemSelected(item)
