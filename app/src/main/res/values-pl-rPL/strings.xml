@@ -7,4 +7,8 @@
     <string name="other_permission_required_description">Uprawnienie wymagane do poprawnego działania aplikacji.</string>
     <string name="determine_your_country">Ustal swój kraj</string>
     <string name="determine_country_from_phone_settings">Ustal swój kraj z ustawień telefonu</string>
+    <string name="refreshing">ODŚWIEŻANIE</string>
+    <string name="refreshing_widget">Odświeżanie widgetu</string>
+    <string name="confirmed">potwierdzone</string>
+    <string name="deaths">zgony</string>
 </resources>

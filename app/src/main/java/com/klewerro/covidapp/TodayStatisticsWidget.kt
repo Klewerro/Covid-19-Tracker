@@ -6,15 +6,16 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import com.klewerro.covidapp.data.repository.CovidRepository
-import com.klewerro.covidapp.util.SharedPreferencesHelper
+import com.klewerro.covidapp.util.formatToString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -47,11 +48,11 @@ class TodayStatisticsWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent?) {
         super.onReceive(context, intent)
-
         if (intent?.action == ACTION_REFRESH_WIDGET_DATA) {
-            Log.d(TAG, "onReceive called")
             val appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
+            Log.d(TAG, "onReceive called: widgetId: $appWidgetId")
 
+            updateAppWidgetState(context, AppWidgetManager.getInstance(context), appWidgetId, "Refresh")
             performDataUpdate(context, AppWidgetManager.getInstance(context), appWidgetId)
         }
     }
@@ -59,9 +60,10 @@ class TodayStatisticsWidget : AppWidgetProvider() {
 
     private fun performDataUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
-            val todayStatistics = repository.getCountryData("PL").countryData.todayStatistic
+            val countryData = repository.getCountryData("PL").countryData
+            val todayStatistics = countryData.todayStatistic
             updateAppWidget(context, appWidgetManager, appWidgetId,
-                todayStatistics.confirmed, todayStatistics.deaths)
+                todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt)
         }
     }
 
@@ -78,14 +80,18 @@ internal fun updateAppWidget(
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int,
     todayConfirmed: Int,
-    todayDeaths: Int
+    todayDeaths: Int,
+    updatedAt: Date
 ) {
     Log.d(TodayStatisticsWidget.TAG, "updateAppWidget called")
 
     val views = RemoteViews(context.packageName, R.layout.today_statistics_widget)
-    views.setTextViewText(R.id.confirmedTextView, "confirmed: $todayConfirmed")
-    views.setTextViewText(R.id.deathsTextView, "deaths: $todayDeaths")
+    views.setTextViewText(R.id.confirmedTextView, "${context.getString(R.string.confirmed)}: $todayConfirmed")
+    views.setTextViewText(R.id.deathsTextView, "${context.getString(R.string.deaths)}: $todayDeaths")
+    views.setTextViewText(R.id.updateDateTextView, updatedAt.formatToString("dd.MM - HH:mm"))
 
+    views.setViewVisibility(R.id.stateTextView, View.GONE)
+    views.setViewVisibility(R.id.dataWrapperRelativeLayout, View.VISIBLE)
 
     //After view click - open main application screen
     views.setOnClickPendingIntent(R.id.todayStatisticsWidget, getPendingIntentToActivity(context))
@@ -95,6 +101,26 @@ internal fun updateAppWidget(
     views.setOnClickPendingIntent(R.id.syncIcon, pendingIntentUpdate)
 
     // Instruct the widget manager to update the widget
+    appWidgetManager.updateAppWidget(appWidgetId, views)
+}
+
+internal fun updateAppWidgetState(
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetId: Int,
+    state: String
+) {
+    Log.d(TodayStatisticsWidget.TAG, "updateAppWidgetState called")
+
+    val views = RemoteViews(context.packageName, R.layout.today_statistics_widget)
+    views.setViewVisibility(R.id.dataWrapperRelativeLayout, View.GONE)
+    views.setViewVisibility(R.id.stateTextView, View.VISIBLE)
+
+    if (state == "Refresh") {
+        views.setTextViewText(R.id.stateTextView, context.getString(R.string.refreshing) + "...")
+        Toast.makeText(context, context.getString(R.string.refreshing_widget) + "...", Toast.LENGTH_SHORT).show()
+    }
+
     appWidgetManager.updateAppWidget(appWidgetId, views)
 }
 
@@ -111,7 +137,7 @@ private fun getPendingIntentUpdateApp(context: Context, appWidgetId: Int): Pendi
 
     return PendingIntent.getBroadcast(
         context,
-        0,
+        appWidgetId,
         intentUpdate,
         0
     )
