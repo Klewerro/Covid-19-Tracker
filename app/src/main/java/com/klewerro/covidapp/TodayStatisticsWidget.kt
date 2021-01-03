@@ -5,7 +5,9 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
@@ -38,6 +40,24 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         }
     }
 
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val countryData = repository.getCountryDataOffline().last().countryData
+            val todayStatistics = countryData.todayStatistic
+            updateAppWidget(
+                context, appWidgetManager, appWidgetId,
+                todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
+            )
+        }
+    }
+
     override fun onEnabled(context: Context) {
         // Enter relevant functionality for when the first widget is created
     }
@@ -52,18 +72,29 @@ class TodayStatisticsWidget : AppWidgetProvider() {
             val appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
             Log.d(TAG, "onReceive called: widgetId: $appWidgetId")
 
-            updateAppWidgetState(context, AppWidgetManager.getInstance(context), appWidgetId, "Refresh")
+            updateAppWidgetState(
+                context,
+                AppWidgetManager.getInstance(context),
+                appWidgetId,
+                "Refresh"
+            )
             performDataUpdate(context, AppWidgetManager.getInstance(context), appWidgetId)
         }
     }
 
 
-    private fun performDataUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    private fun performDataUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             val countryData = repository.getCountryData("PL").countryData
             val todayStatistics = countryData.todayStatistic
-            updateAppWidget(context, appWidgetManager, appWidgetId,
-                todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt)
+            updateAppWidget(
+                context, appWidgetManager, appWidgetId,
+                todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
+            )
         }
     }
 
@@ -84,14 +115,24 @@ internal fun updateAppWidget(
     updatedAt: Date
 ) {
     Log.d(TodayStatisticsWidget.TAG, "updateAppWidget called")
-
     val views = RemoteViews(context.packageName, R.layout.today_statistics_widget)
-    views.setTextViewText(R.id.confirmedTextView, "${context.getString(R.string.confirmed)}: $todayConfirmed")
-    views.setTextViewText(R.id.deathsTextView, "${context.getString(R.string.deaths)}: $todayDeaths")
+    val oneCellWidget = checkIfWidgetIsOneCell(context, appWidgetManager, appWidgetId)
+
+    views.setTextViewText(
+        R.id.confirmedTextView, if (!oneCellWidget)
+            "${context.getString(R.string.confirmed)}: $todayConfirmed"
+        else todayConfirmed.toString()
+    )
+    views.setTextViewText(
+        R.id.deathsTextView,
+        if (!oneCellWidget) "${context.getString(R.string.deaths)}: $todayDeaths"
+        else todayDeaths.toString()
+    )
     views.setTextViewText(R.id.updateDateTextView, updatedAt.formatToString("dd.MM - HH:mm"))
 
     views.setViewVisibility(R.id.stateTextView, View.GONE)
     views.setViewVisibility(R.id.dataWrapperRelativeLayout, View.VISIBLE)
+    views.setViewVisibility(R.id.updateDateTextView, if (!oneCellWidget) View.VISIBLE else View.GONE)
 
     //After view click - open main application screen
     views.setOnClickPendingIntent(R.id.todayStatisticsWidget, getPendingIntentToActivity(context))
@@ -118,7 +159,11 @@ internal fun updateAppWidgetState(
 
     if (state == "Refresh") {
         views.setTextViewText(R.id.stateTextView, context.getString(R.string.refreshing) + "...")
-        Toast.makeText(context, context.getString(R.string.refreshing_widget) + "...", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            context.getString(R.string.refreshing_widget) + "...",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -140,5 +185,37 @@ private fun getPendingIntentUpdateApp(context: Context, appWidgetId: Int): Pendi
         appWidgetId,
         intentUpdate,
         0
+    )
+}
+
+private fun checkIfWidgetIsOneCell(
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetId: Int
+): Boolean {
+    val widgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
+    val minWidth = widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+    val maxWidth = widgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+    val oneCellWidth = convertDpToPx(40f, context).toInt() - 30
+    val isOneCellWidth = oneCellWidth == 70
+    Log.d(TodayStatisticsWidget.TAG, "updateAppWidget: min:$minWidth; max:$maxWidth")
+    Log.d(
+        TodayStatisticsWidget.TAG,
+        "updateAppWidget: oneCellWidth:$oneCellWidth; isOneCellWidth:$isOneCellWidth"
+    )
+
+    if (oneCellWidth in minWidth..maxWidth) {
+        Log.d(TodayStatisticsWidget.TAG, "updateAppWidget: in range = true")
+        return true
+    }
+
+    return false
+}
+
+private fun convertDpToPx(sp: Float, context: Context): Float {
+    return TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        sp,
+        context.resources.displayMetrics
     )
 }
