@@ -11,4 +11,5 @@
     <string name="refreshing_widget">Odświeżanie widgetu</string>
     <string name="confirmed">potwierdzone</string>
     <string name="deaths">zgony</string>
+    <string name="refreshing_widget_error">Błąd przy odświeżaniu widgetu</string>
 </resources>

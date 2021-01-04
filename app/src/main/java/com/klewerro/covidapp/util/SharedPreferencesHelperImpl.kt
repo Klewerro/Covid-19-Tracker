@@ -22,9 +22,16 @@ class SharedPreferencesHelperImpl @Inject constructor(context: Context) : Shared
 
     override fun getCountryId() = prefs.getInt(PREF_COUNTRY_ID, -1)
 
+    override fun saveWidgetCountry(widgetId: Int, countryCode: String) = prefs.edit()
+        .putString(PREF_WIDGET_COUNTRY_CODE + widgetId, countryCode)
+        .apply()
+
+    override fun getWidgetCountry(widgetId: Int): String? = prefs.getString(PREF_WIDGET_COUNTRY_CODE + widgetId, null)
+
 
     companion object {
         private const val PREF_FETCH_TIME = "${BuildConfig.APPLICATION_ID}_pref_time"
         private const val PREF_COUNTRY_ID = "${BuildConfig.APPLICATION_ID}_pref_country_id"
+        private const val PREF_WIDGET_COUNTRY_CODE = "${BuildConfig.APPLICATION_ID}_pref_widget_country_code_"
     }
 }

@@ -13,10 +13,18 @@
     android:paddingRight="5dp"
     android:theme="@style/ThemeOverlay.CovidApp.AppWidgetContainer">
 
+    <TextView
+        android:id="@+id/countryCodeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        tools:text="COUNTRY" />
+
     <RelativeLayout
         android:id="@+id/dataWrapperRelativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/countryCodeTextView">
 
         <TextView
             android:id="@+id/confirmedTextView"

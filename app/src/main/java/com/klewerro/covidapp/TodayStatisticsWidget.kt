@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import com.klewerro.covidapp.data.repository.CovidRepository
+import com.klewerro.covidapp.util.SharedPreferencesHelper
 import com.klewerro.covidapp.util.formatToString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class TodayStatisticsWidget : AppWidgetProvider() {
 
     @Inject lateinit var repository: CovidRepository
+    @Inject lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     override fun onUpdate(
         context: Context,
@@ -51,10 +53,13 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         CoroutineScope(Dispatchers.IO).launch {
             val countryData = repository.getCountryDataOffline().last().countryData
             val todayStatistics = countryData.todayStatistic
-            updateAppWidget(
-                context, appWidgetManager, appWidgetId,
-                todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
-            )
+            val country = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
+            if (country != null) {
+                updateAppWidget(
+                    context, appWidgetManager, appWidgetId, country,
+                    todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
+                )
+            }
         }
     }
 
@@ -76,7 +81,7 @@ class TodayStatisticsWidget : AppWidgetProvider() {
                 context,
                 AppWidgetManager.getInstance(context),
                 appWidgetId,
-                "Refresh"
+                WidgetState.REFRESH
             )
             performDataUpdate(context, AppWidgetManager.getInstance(context), appWidgetId)
         }
@@ -91,10 +96,15 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         CoroutineScope(Dispatchers.IO).launch {
             val countryData = repository.getCountryData("PL").countryData
             val todayStatistics = countryData.todayStatistic
-            updateAppWidget(
-                context, appWidgetManager, appWidgetId,
-                todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
-            )
+            val country = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
+            Log.d(TAG, "performDataUpdate country: $country")
+            if (country != null) {
+                updateAppWidget(
+                    context, appWidgetManager, appWidgetId, country,
+                    todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
+                )
+            }
+
         }
     }
 
@@ -110,6 +120,7 @@ internal fun updateAppWidget(
     context: Context,
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int,
+    country: String,
     todayConfirmed: Int,
     todayDeaths: Int,
     updatedAt: Date
@@ -118,6 +129,7 @@ internal fun updateAppWidget(
     val views = RemoteViews(context.packageName, R.layout.today_statistics_widget)
     val oneCellWidget = checkIfWidgetIsOneCell(context, appWidgetManager, appWidgetId)
 
+    views.setTextViewText(R.id.countryCodeTextView, country)
     views.setTextViewText(
         R.id.confirmedTextView, if (!oneCellWidget)
             "${context.getString(R.string.confirmed)}: $todayConfirmed"
@@ -149,7 +161,7 @@ internal fun updateAppWidgetState(
     context: Context,
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int,
-    state: String
+    state: WidgetState
 ) {
     Log.d(TodayStatisticsWidget.TAG, "updateAppWidgetState called")
 
@@ -157,13 +169,18 @@ internal fun updateAppWidgetState(
     views.setViewVisibility(R.id.dataWrapperRelativeLayout, View.GONE)
     views.setViewVisibility(R.id.stateTextView, View.VISIBLE)
 
-    if (state == "Refresh") {
+    if (state == WidgetState.REFRESH) {
         views.setTextViewText(R.id.stateTextView, context.getString(R.string.refreshing) + "...")
         Toast.makeText(
             context,
             context.getString(R.string.refreshing_widget) + "...",
             Toast.LENGTH_SHORT
         ).show()
+    } else if (state == WidgetState.ERROR) {
+        Toast.makeText(
+            context,
+            context.getString(R.string.refreshing_widget_error) + "...",
+            Toast.LENGTH_LONG)
     }
 
     appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -218,4 +235,9 @@ private fun convertDpToPx(sp: Float, context: Context): Float {
         sp,
         context.resources.displayMetrics
     )
+}
+
+enum class WidgetState {
+    REFRESH,
+    ERROR
 }

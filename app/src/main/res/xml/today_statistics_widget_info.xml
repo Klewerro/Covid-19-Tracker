@@ -2,9 +2,11 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialKeyguardLayout="@layout/today_statistics_widget"
     android:initialLayout="@layout/today_statistics_widget"
-    android:minWidth="40dp"
+    android:minWidth="120dp"
     android:minHeight="40dp"
+    android:minResizeWidth="40dp"
     android:previewImage="@drawable/widget1_preview"
     android:resizeMode="horizontal"
     android:updatePeriodMillis="1800000"
-    android:widgetCategory="home_screen"></appwidget-provider>
+    android:widgetCategory="home_screen"
+    android:configure="com.klewerro.covidapp.TodayStatisticsWidgetConfigurationActivity"></appwidget-provider>
