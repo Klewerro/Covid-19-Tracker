@@ -29,8 +29,8 @@ class CovidRepositoryImpl @Inject constructor(
         return countryDataWithTimeline
     }
 
-    override suspend fun getCountryDataOffline(): List<CountryDataWithTimeline>
-        = countryDataDao.getAllCountryData()
+    override suspend fun getCountryDataOffline(countryCode: String): List<CountryDataWithTimeline>
+        = countryDataDao.getAllCountryData(countryCode)
 
     override suspend fun getCountryList(): List<Country> {
         var countryList: List<Country>

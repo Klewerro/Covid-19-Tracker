@@ -51,12 +51,13 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val countryData = repository.getCountryDataOffline().last().countryData
-            val todayStatistics = countryData.todayStatistic
-            val country = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
-            if (country != null) {
+            val countryCode = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
+            if (countryCode != null) {
+                val countryData = repository.getCountryDataOffline(countryCode).last().countryData
+                val todayStatistics = countryData.todayStatistic
+
                 updateAppWidget(
-                    context, appWidgetManager, appWidgetId, country,
+                    context, appWidgetManager, appWidgetId, countryData.name,
                     todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
                 )
             }
@@ -94,13 +95,14 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         appWidgetId: Int
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val countryData = repository.getCountryData("PL").countryData
-            val todayStatistics = countryData.todayStatistic
-            val country = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
-            Log.d(TAG, "performDataUpdate country: $country")
-            if (country != null) {
+            val countryCode = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
+            Log.d(TAG, "performDataUpdate country: $countryCode")
+            if (countryCode != null) {
+                val countryData = repository.getCountryData(countryCode).countryData
+                val todayStatistics = countryData.todayStatistic
+
                 updateAppWidget(
-                    context, appWidgetManager, appWidgetId, country,
+                    context, appWidgetManager, appWidgetId, countryData.name,
                     todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
                 )
             }
@@ -120,7 +122,7 @@ internal fun updateAppWidget(
     context: Context,
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int,
-    country: String,
+    countryName: String,
     todayConfirmed: Int,
     todayDeaths: Int,
     updatedAt: Date
@@ -129,7 +131,7 @@ internal fun updateAppWidget(
     val views = RemoteViews(context.packageName, R.layout.today_statistics_widget)
     val oneCellWidget = checkIfWidgetIsOneCell(context, appWidgetManager, appWidgetId)
 
-    views.setTextViewText(R.id.countryCodeTextView, country)
+    views.setTextViewText(R.id.countryCodeTextView, countryName)
     views.setTextViewText(
         R.id.confirmedTextView, if (!oneCellWidget)
             "${context.getString(R.string.confirmed)}: $todayConfirmed"

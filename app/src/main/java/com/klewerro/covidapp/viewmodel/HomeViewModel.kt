@@ -51,7 +51,7 @@ class HomeViewModel @ViewModelInject constructor(
                 emit(data)
                 //showToast("Data from API.")   //Todo: add liveData variable and change state. Observe on fragment code
             } else {
-                data = repository.getCountryDataOffline().last()
+                data = repository.getCountryDataOffline("PL").last()
                 emit(data)
                 //showToast("Data from database.")
             }

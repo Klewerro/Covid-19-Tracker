@@ -14,6 +14,6 @@ interface CountryDataDao {
     suspend fun insertCountryData(countryData: CountryData): Long
 
     @Transaction
-    @Query("SELECT * FROM country_data")
-    suspend fun getAllCountryData(): List<CountryDataWithTimeline>
+    @Query("SELECT * FROM country_data WHERE code LIKE :countryCode")
+    suspend fun getAllCountryData(countryCode: String): List<CountryDataWithTimeline>
 }
