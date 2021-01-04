@@ -11,7 +11,7 @@ interface CountryDao {
     @Insert
     suspend fun insertCountries(countries: List<Country>)
 
-    @Query("SELECT * from country")
+    @Query("SELECT * from country order by name")
     suspend fun getCountries(): List<Country>
 
     @Query("Select * from country where code LIKE :countryCode")

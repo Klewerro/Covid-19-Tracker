@@ -13,11 +13,12 @@
         android:layout_height="wrap_content"
         android:text="Select country"/>
 
-    <EditText
-        android:id="@+id/countryCodeTextView"
+    <Spinner
+        android:id="@+id/countriesSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter country code..." />
+        android:spinnerMode="dialog"
+        tools:listitem="@layout/support_simple_spinner_dropdown_item"/>
 
     <Button
         android:id="@+id/acceptButton"

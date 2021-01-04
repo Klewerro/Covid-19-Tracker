@@ -26,32 +26,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-
-        viewModel.countryDataWithTimeline.observe(viewLifecycleOwner) { countryData ->
-            countryTextView.text = countryData.countryData.name
-            populationSizeTextView.text = "Population: ${countryData.countryData.population}"
-            confirmedTextView.text = "Confirmed: ${countryData.countryData.todayStatistic.confirmed}"
-            deathsTextView.text = "Deaths: ${countryData.countryData.todayStatistic.deaths}"
-            chart.setLineDataSet(countryData.timelineData.reversed())
-        }
-
-        viewModel.dailyTimelineData.observe(viewLifecycleOwner) {dailyTimelineData ->
-            chartDaily.setLineDataSet(dailyTimelineData.reversed())
-        }
-
-        viewModel.countries.observe(viewLifecycleOwner) {countries ->
-            countriesSpinner.adapter = ArrayAdapter(requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                countries.map { it.name })
-        }
-
-        viewModel.country.observe(viewLifecycleOwner) { country ->
-            if (country != null) {
-                val index = viewModel.countries.value!!.indexOfFirst { it.name == country.name }
-                countriesSpinner.setSelection(index)
-                showToast("Determined country: ${country.name}")
-            }
-        }
+        setObservers()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -76,6 +51,35 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     ) {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             viewModel.getCountryCode(requireContext())
+        }
+    }
+
+
+    private fun setObservers() {
+        viewModel.countryDataWithTimeline.observe(viewLifecycleOwner) { countryData ->
+            countryTextView.text = countryData.countryData.name
+            populationSizeTextView.text = "Population: ${countryData.countryData.population}"
+            confirmedTextView.text = "Confirmed: ${countryData.countryData.todayStatistic.confirmed}"
+            deathsTextView.text = "Deaths: ${countryData.countryData.todayStatistic.deaths}"
+            chart.setLineDataSet(countryData.timelineData.reversed())
+        }
+
+        viewModel.dailyTimelineData.observe(viewLifecycleOwner) {dailyTimelineData ->
+            chartDaily.setLineDataSet(dailyTimelineData.reversed())
+        }
+
+        viewModel.countries.observe(viewLifecycleOwner) {countries ->
+            countriesSpinner.adapter = ArrayAdapter(requireContext(),
+                R.layout.support_simple_spinner_dropdown_item,
+                countries.map { it.name })
+        }
+
+        viewModel.country.observe(viewLifecycleOwner) { country ->
+            if (country != null) {
+                val index = viewModel.countries.value!!.indexOfFirst { it.name == country.name }
+                countriesSpinner.setSelection(index)
+                showToast("Determined country: ${country.name}")
+            }
         }
     }
 
