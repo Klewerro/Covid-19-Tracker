@@ -3,6 +3,7 @@ package com.klewerro.covidapp
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -72,9 +73,10 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         // Enter relevant functionality for when the last widget is disabled
     }
 
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent?.action == ACTION_REFRESH_WIDGET_DATA) {
+
+        fun online() {
             val appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
             Log.d(TAG, "onReceive called: widgetId: $appWidgetId")
 
@@ -82,9 +84,35 @@ class TodayStatisticsWidget : AppWidgetProvider() {
                 context,
                 AppWidgetManager.getInstance(context),
                 appWidgetId,
-                WidgetState.REFRESH
+                WidgetState.REFRESH,
+                true
             )
+
             performDataUpdate(context, AppWidgetManager.getInstance(context), appWidgetId)
+        }
+
+        fun offline() {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(ComponentName(context, this::class.java))
+
+            CoroutineScope(Dispatchers.IO).launch {
+                for (widgetId in appWidgetIds) {
+                    updateAppWidgetState(
+                        context,
+                        AppWidgetManager.getInstance(context),
+                        widgetId,
+                        WidgetState.REFRESH,
+                        false
+                    )
+
+                    performOfflineDataUpdate(context, appWidgetManager, widgetId)
+                }
+            }
+        }
+
+        when (intent?.action) {
+            ACTION_REFRESH_WIDGET_DATA -> online()
+            ACTION_REFRESH_WIDGETS_AFTER_IN_APP_DATA_FETCH -> offline()
         }
     }
 
@@ -110,10 +138,29 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         }
     }
 
+    private suspend fun performOfflineDataUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int
+    ) {
+        val countryCode = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
+        Log.d(TAG, "performOfflineDataUpdate country: $countryCode")
+        if (countryCode != null) {
+            val countryData = repository.getCountryDataOffline(countryCode).last().countryData
+            val todayStatistics = countryData.todayStatistic
+
+            updateAppWidget(
+                context, appWidgetManager, appWidgetId, countryData.name,
+                todayStatistics.confirmed, todayStatistics.deaths, countryData.updatedAt
+            )
+        }
+    }
+
 
     companion object {
-        const val ACTION_REFRESH_WIDGET_DATA = "action_refresh_intent_data"
         const val TAG = "TodayStatisticsWidget"
+        const val ACTION_REFRESH_WIDGET_DATA = "action_refresh_intent_data"
+        const val ACTION_REFRESH_WIDGETS_AFTER_IN_APP_DATA_FETCH = "action_refresh_all_widgets_after_in_app_fetch"
     }
 }
 
@@ -163,7 +210,8 @@ internal fun updateAppWidgetState(
     context: Context,
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int,
-    state: WidgetState
+    state: WidgetState,
+    showToast: Boolean
 ) {
     Log.d(TodayStatisticsWidget.TAG, "updateAppWidgetState called")
 
@@ -173,16 +221,20 @@ internal fun updateAppWidgetState(
 
     if (state == WidgetState.REFRESH) {
         views.setTextViewText(R.id.stateTextView, context.getString(R.string.refreshing) + "...")
-        Toast.makeText(
-            context,
-            context.getString(R.string.refreshing_widget) + "...",
-            Toast.LENGTH_SHORT
-        ).show()
+        if (showToast) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.refreshing_widget) + "...",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
     } else if (state == WidgetState.ERROR) {
         Toast.makeText(
             context,
             context.getString(R.string.refreshing_widget_error) + "...",
-            Toast.LENGTH_LONG)
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     appWidgetManager.updateAppWidget(appWidgetId, views)

@@ -1,6 +1,7 @@
 package com.klewerro.covidapp.ui.Home
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
@@ -11,6 +12,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.klewerro.covidapp.R
+import com.klewerro.covidapp.TodayStatisticsWidget
 import com.klewerro.covidapp.ui.checkPermissions
 import com.klewerro.covidapp.ui.showToast
 import com.klewerro.covidapp.viewmodel.HomeViewModel
@@ -62,6 +64,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             confirmedTextView.text = "Confirmed: ${countryData.countryData.todayStatistic.confirmed}"
             deathsTextView.text = "Deaths: ${countryData.countryData.todayStatistic.deaths}"
             chart.setLineDataSet(countryData.timelineData.reversed())
+
+            sendUpdateWidgetsBroadcast()
         }
 
         viewModel.dailyTimelineData.observe(viewLifecycleOwner) {dailyTimelineData ->
@@ -83,6 +87,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    private fun sendUpdateWidgetsBroadcast() {
+        val intentUpdate = Intent(context, TodayStatisticsWidget::class.java)
+        intentUpdate.action = TodayStatisticsWidget.ACTION_REFRESH_WIDGETS_AFTER_IN_APP_DATA_FETCH
+
+        requireContext().sendBroadcast(intentUpdate)
+    }
 
     companion object {
         const val PERMISSION_LOCATION_REQUEST_CODE = 101
