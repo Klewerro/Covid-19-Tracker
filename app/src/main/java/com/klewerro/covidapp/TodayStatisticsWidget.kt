@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import com.klewerro.covidapp.data.repository.CovidRepository
+import com.klewerro.covidapp.data.repository.WidgetCovidRepository
 import com.klewerro.covidapp.util.SharedPreferencesHelper
 import com.klewerro.covidapp.util.formatToString
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +29,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TodayStatisticsWidget : AppWidgetProvider() {
 
-    @Inject lateinit var repository: CovidRepository
+    @Inject lateinit var repository: WidgetCovidRepository
     @Inject lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     override fun onUpdate(
@@ -54,7 +55,7 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         CoroutineScope(Dispatchers.IO).launch {
             val countryCode = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
             if (countryCode != null) {
-                val countryData = repository.getCountryDataOffline(countryCode).last().countryData
+                val countryData = repository.getCountryDataOffline(countryCode).countryData
                 val todayStatistics = countryData.todayStatistic
 
                 updateAppWidget(
@@ -146,7 +147,7 @@ class TodayStatisticsWidget : AppWidgetProvider() {
         val countryCode = sharedPreferencesHelper.getWidgetCountry(appWidgetId)
         Log.d(TAG, "performOfflineDataUpdate country: $countryCode")
         if (countryCode != null) {
-            val countryData = repository.getCountryDataOffline(countryCode).last().countryData
+            val countryData = repository.getCountryDataOffline(countryCode).countryData
             val todayStatistics = countryData.todayStatistic
 
             updateAppWidget(

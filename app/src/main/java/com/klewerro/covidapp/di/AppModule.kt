@@ -9,6 +9,7 @@ import com.klewerro.covidapp.data.database.dao.CountryDataDao
 import com.klewerro.covidapp.data.database.dao.TimelineDataDao
 import com.klewerro.covidapp.data.repository.CovidRepositoryImpl
 import com.klewerro.covidapp.data.repository.CovidRepository
+import com.klewerro.covidapp.data.repository.WidgetCovidRepository
 import com.klewerro.covidapp.util.SharedPreferencesHelper
 import com.klewerro.covidapp.util.SharedPreferencesHelperImpl
 import dagger.Module
@@ -69,4 +70,12 @@ object AppModule {
         timelineDataDao: TimelineDataDao,
         countryDao: CountryDao
     ) = CovidRepositoryImpl(covidApi, countryDataDao, timelineDataDao, countryDao) as CovidRepository
+
+    @Provides
+    @Singleton
+    fun provideWidgetCovidRepository(
+        covidApi: CovidApi,
+        countryDataDao: CountryDataDao,
+        timelineDataDao: TimelineDataDao,
+    ) = WidgetCovidRepository(covidApi, countryDataDao, timelineDataDao)
 }

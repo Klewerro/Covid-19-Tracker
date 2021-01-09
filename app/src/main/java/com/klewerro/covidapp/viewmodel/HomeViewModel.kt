@@ -29,14 +29,7 @@ class HomeViewModel @ViewModelInject constructor(
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     val countryDataWithTimeline = repository.countryDataWithTimeline
-    var _countries = repository.countries
-    set(value) {
-        if (selectedCountry.value == null) {
-
-        }
-    }
-
-    val countries = _countries
+    val countries = repository.countries
     val selectedCountry = repository.country
     var dailyTimelineData = MutableLiveData<List<DailyTimelineData>>()
 
