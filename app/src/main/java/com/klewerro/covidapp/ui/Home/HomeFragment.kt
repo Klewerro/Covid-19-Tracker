@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,11 +25,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
     private val viewModel by viewModels<HomeViewModel>()
+    private var isInitialSpinnerSelection = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         setObservers()
+
+        countriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (!isInitialSpinnerSelection)
+                    viewModel.setSelectedCountry(position)
+                isInitialSpinnerSelection = false
+            }
+
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -65,6 +78,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             deathsTextView.text = "Deaths: ${countryData.countryData.todayStatistic.deaths}"
             chart.setLineDataSet(countryData.timelineData.reversed())
 
+            viewModel.getDailyCasesFromTimelineData(countryData.timelineData)
             sendUpdateWidgetsBroadcast()
         }
 
@@ -76,13 +90,20 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             countriesSpinner.adapter = ArrayAdapter(requireContext(),
                 R.layout.support_simple_spinner_dropdown_item,
                 countries.map { it.name })
+                viewModel.getSelectedCountry()
+            if (countries.isEmpty()) {
+                viewModel.getCountries()
+            }
         }
 
-        viewModel.country.observe(viewLifecycleOwner) { country ->
+        viewModel.selectedCountry.observe(viewLifecycleOwner) { country ->
             if (country != null) {
-                val index = viewModel.countries.value!!.indexOfFirst { it.name == country.name }
-                countriesSpinner.setSelection(index)
-                showToast("Determined country: ${country.name}")
+                val index = viewModel.countries.value?.indexOfFirst { it.id == country.id }
+                if (index != null) {
+                    countriesSpinner.setSelection(index)
+                    viewModel.getCountryDataWithTimeline(country.code)
+                    showToast("Determined country: ${country.name}")
+                }
             }
         }
     }

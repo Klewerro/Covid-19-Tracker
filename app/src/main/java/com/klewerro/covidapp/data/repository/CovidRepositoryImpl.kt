@@ -1,5 +1,7 @@
 package com.klewerro.covidapp.data.repository
 
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.klewerro.covidapp.api.CovidApi
 import com.klewerro.covidapp.data.database.dao.CountryDao
 import com.klewerro.covidapp.data.database.dao.CountryDataDao
@@ -7,6 +9,7 @@ import com.klewerro.covidapp.data.database.dao.TimelineDataDao
 import com.klewerro.covidapp.data.entity.Country
 import com.klewerro.covidapp.data.entity.CountryData
 import com.klewerro.covidapp.data.entity.CountryDataWithTimeline
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class CovidRepositoryImpl @Inject constructor(
@@ -16,7 +19,11 @@ class CovidRepositoryImpl @Inject constructor(
     private val countryDao: CountryDao
     ) : CovidRepository {
 
-    override suspend fun getCountryData(countryCode: String): CountryDataWithTimeline {
+    override val countries = countryDao.getCountries()
+    override val country = MutableLiveData<Country>()
+    override val countryDataWithTimeline = MutableLiveData<CountryDataWithTimeline>()
+
+    override suspend fun getCountryData(countryCode: String) {
         val response = covidApi.getCountryData(countryCode)
         val countryData = CountryData(response.data)
 
@@ -26,29 +33,35 @@ class CovidRepositoryImpl @Inject constructor(
         countryDataWithTimeline.timelineData.map { it.countryDataId = countryDataId }
         timelineDataDao.insertTimelineData(countryDataWithTimeline.timelineData)
 
-        return countryDataWithTimeline
+        this.countryDataWithTimeline.postValue(countryDataWithTimeline)
     }
 
-    override suspend fun getCountryDataOffline(countryCode: String): List<CountryDataWithTimeline>
-        = countryDataDao.getAllCountryData(countryCode)
+    override suspend fun getCountryDataOffline(countryCode: String) {
+        this.countryDataWithTimeline.postValue(countryDataDao.getAllCountryData(countryCode).last())
+    }
 
-    override suspend fun getCountryList(): List<Country> {
-        var countryList: List<Country>
-
-        return if (countryDao.getCountries().isEmpty()) {
+    override suspend fun getCountryList() {
+        if (countries.value?.isEmpty() == true) {
             val response = covidApi.getCountryList()
-            countryList = response.data
+            val countryList = response.data
             countryDao.insertCountries(countryList)
-            countryList
-        } else {
-            countryList = countryDao.getCountries()
-            countryList
         }
     }
 
-    override suspend fun getCountry(countryCode: String): Country =
-        countryDao.getCountry(countryCode)
+    override suspend fun getCountry(countryCode: String) {
+        country.postValue(countryDao.getCountry(countryCode))
+    }
 
-    override suspend fun getCountry(id: Int): Country =
-        countryDao.getCountry(id)
+
+    override suspend fun getCountry(id: Int) {
+        if (countries.value?.isEmpty() == false) {
+            country.postValue(countryDao.getCountry(id))
+        } else {
+            //For case, if selectedCountry will be loaded before countries
+            delay(100)
+            getCountry(id)
+            Log.d("TodayStatisticsWidget", "awaited")
+        }
+    }
+
 }

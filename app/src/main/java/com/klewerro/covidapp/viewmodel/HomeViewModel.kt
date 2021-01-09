@@ -28,76 +28,39 @@ class HomeViewModel @ViewModelInject constructor(
     private var lastUpdateTime: Long = 0
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    var countryDataWithTimeline: LiveData<CountryDataWithTimeline>
-    var countries: LiveData<List<Country>>
-    var dailyTimelineData: MutableLiveData<List<DailyTimelineData>>
-    var country: MutableLiveData<Country>
+    val countryDataWithTimeline = repository.countryDataWithTimeline
+    var _countries = repository.countries
+    set(value) {
+        if (selectedCountry.value == null) {
 
-    init {
-        countryDataWithTimeline = getCountryDataWithTimeline("PL")
-        countries = getCountryList()
-        dailyTimelineData = MutableLiveData()
-        country = MutableLiveData()
+        }
     }
 
+    val countries = _countries
+    val selectedCountry = repository.country
+    var dailyTimelineData = MutableLiveData<List<DailyTimelineData>>()
 
-    fun getCountryDataWithTimeline(countryCode: String): LiveData<CountryDataWithTimeline> =
-        liveData(Dispatchers.IO) {
-            var data: CountryDataWithTimeline
+    fun getCountries() = viewModelScope.launch(Dispatchers.IO) {
+        repository.getCountryList()
+    }
 
+    fun getSelectedCountry() = viewModelScope.launch(Dispatchers.IO) {
+        repository.getCountry(sharedPreferencesHelper.getCountryId())
+    }
+
+    fun getCountryDataWithTimeline(countryCode: String) = viewModelScope.launch(Dispatchers.IO) {
             if (checkIsTimeForFetch()) {
-                data = repository.getCountryData("PL")
+                repository.getCountryData("PL")
                 sharedPreferencesHelper.saveFetchTime(System.nanoTime())
-                emit(data)
                 //showToast("Data from API.")   //Todo: add liveData variable and change state. Observe on fragment code
             } else {
-                data = repository.getCountryDataOffline("PL").last()
-                emit(data)
+                repository.getCountryDataOffline("PL")
                 //showToast("Data from database.")
             }
-
-            getDailyCasesFromTimelineData(data.timelineData)
         }
 
-    fun getCountryList() = liveData<List<Country>>(Dispatchers.IO) {
-        emit(repository.getCountryList())
-        val country = repository.getCountry(sharedPreferencesHelper.getCountryId())
-        withContext(Dispatchers.Main) {
-            this@HomeViewModel.country.value = country
-        }
-    }
-
-    fun testCall(countryCode: String) {
-        countryDataWithTimeline = getCountryDataWithTimeline(countryCode)
-    }
-
-    fun getCountryCode(context: Context) {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-        fusedLocationClient.lastLocation.addOnSuccessListener { position ->
-            val countryCode = getCountryCodeFromLocation(context, Pair(position.latitude, position.longitude))
-
-            viewModelScope.launch (Dispatchers.IO) {
-                findCountryFromCode(countryCode)
-            }
-        }
-    }
-
-    fun getCountryCodeFromPhoneSettings(context: Context) {
-        val locales = context.resources.configuration.locales
-        val tag = locales[0].country
-        viewModelScope.launch(Dispatchers.IO) {
-            findCountryFromCode(tag)
-        }
-    }
-
-
-    private fun checkIsTimeForFetch(): Boolean {
-        val currentTime = System.nanoTime()
-        lastUpdateTime = sharedPreferencesHelper.getFetchTime()
-        return currentTime - lastUpdateTime > refreshTime
-    }
-
-    private fun getDailyCasesFromTimelineData(timelineData: List<TimelineData>) {
+    //Todo: Get rid of it: data is already in new_... timelineData fields
+    fun getDailyCasesFromTimelineData(timelineData: List<TimelineData>) {
         viewModelScope.launch(Dispatchers.Default) {
             val data = List(timelineData.size - 1) { index ->
                 val day1 = timelineData[index]
@@ -119,6 +82,40 @@ class HomeViewModel @ViewModelInject constructor(
         }
     }
 
+    fun getCountryCode(context: Context) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        fusedLocationClient.lastLocation.addOnSuccessListener { position ->
+            val countryCode = getCountryCodeFromLocation(context, Pair(position.latitude, position.longitude))
+
+            viewModelScope.launch (Dispatchers.IO) {
+                findCountryFromCode(countryCode)
+            }
+        }
+    }
+
+    fun getCountryCodeFromPhoneSettings(context: Context) {
+        val locales = context.resources.configuration.locales
+        val tag = locales[0].country
+        viewModelScope.launch(Dispatchers.IO) {
+            findCountryFromCode(tag)
+        }
+    }
+
+    fun setSelectedCountry(countryIndex: Int) {
+        val selectedCountry = countries.value?.get(countryIndex) ?: return
+        if (selectedCountry.id != this.selectedCountry.value?.id) {
+            sharedPreferencesHelper.saveCountryId(selectedCountry.id)
+            this.selectedCountry.postValue(selectedCountry)
+        }
+    }
+
+
+    private fun checkIsTimeForFetch(): Boolean {
+        val currentTime = System.nanoTime()
+        lastUpdateTime = sharedPreferencesHelper.getFetchTime()
+        return currentTime - lastUpdateTime > refreshTime
+    }
+
     private fun getCountryCodeFromLocation(context: Context, latLang: Pair<Double, Double>): String  {  //Todo: add position
         val myLocation = Geocoder(context)
         val list = myLocation.getFromLocation(latLang.first, latLang.second, 3)
@@ -126,11 +123,7 @@ class HomeViewModel @ViewModelInject constructor(
     }
 
     private suspend fun findCountryFromCode(countryCode: String) {
-        val country = repository.getCountry(countryCode)
-
-        sharedPreferencesHelper.saveCountryId(country.id)
-        withContext(Dispatchers.Main) {
-            this@HomeViewModel.country.value = country
-        }
+        repository.getCountry(countryCode)
+        selectedCountry.value?.let { sharedPreferencesHelper.saveCountryId(it.id) }
     }
 }

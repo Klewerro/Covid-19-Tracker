@@ -15,5 +15,5 @@ interface CountryDataDao {
 
     @Transaction
     @Query("SELECT * FROM country_data WHERE code LIKE :countryCode")
-    suspend fun getAllCountryData(countryCode: String): List<CountryDataWithTimeline>
+    suspend fun getAllCountryData(countryCode: String): List<CountryDataWithTimeline>   //Todo: add select last, change list type to object
 }

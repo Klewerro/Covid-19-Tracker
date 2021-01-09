@@ -1,5 +1,6 @@
 package com.klewerro.covidapp.data.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -12,7 +13,7 @@ interface CountryDao {
     suspend fun insertCountries(countries: List<Country>)
 
     @Query("SELECT * from country order by name")
-    suspend fun getCountries(): List<Country>
+    fun getCountries(): LiveData<List<Country>>
 
     @Query("Select * from country where code LIKE :countryCode")
     suspend fun getCountry(countryCode: String): Country

@@ -20,7 +20,7 @@ class SharedPreferencesHelperImpl @Inject constructor(context: Context) : Shared
         .putInt(PREF_COUNTRY_ID, countryId)
         .apply()
 
-    override fun getCountryId() = prefs.getInt(PREF_COUNTRY_ID, -1)
+    override fun getCountryId() = prefs.getInt(PREF_COUNTRY_ID, 1)
 
     override fun saveWidgetCountry(widgetId: Int, countryCode: String) = prefs.edit()
         .putString(PREF_WIDGET_COUNTRY_CODE + widgetId, countryCode)
