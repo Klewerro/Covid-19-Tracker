@@ -1,14 +1,11 @@
 package com.klewerro.covidapp.viewmodel
 
-import android.app.Application
 import android.content.Context
 import android.location.Geocoder
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.klewerro.covidapp.data.entity.Country
-import com.klewerro.covidapp.data.entity.CountryDataWithTimeline
 import com.klewerro.covidapp.data.model.DailyTimelineData
 import com.klewerro.covidapp.data.entity.TimelineData
 import com.klewerro.covidapp.data.repository.CovidRepository
@@ -42,12 +39,12 @@ class HomeViewModel @ViewModelInject constructor(
     }
 
     fun getCountryDataWithTimeline(countryCode: String) = viewModelScope.launch(Dispatchers.IO) {
-            if (checkIsTimeForFetch()) {
-                repository.getCountryData("PL")
+            if (checkIsTimeForFetch() || checkIsLastFetchFromDifferentCountry()) {
+                selectedCountry.value?.let { repository.getCountryData(it.code) }
                 sharedPreferencesHelper.saveFetchTime(System.nanoTime())
                 //showToast("Data from API.")   //Todo: add liveData variable and change state. Observe on fragment code
             } else {
-                repository.getCountryDataOffline("PL")
+                selectedCountry.value?.let { repository.getCountryDataOffline(it.code) }
                 //showToast("Data from database.")
             }
         }
@@ -107,6 +104,14 @@ class HomeViewModel @ViewModelInject constructor(
         val currentTime = System.nanoTime()
         lastUpdateTime = sharedPreferencesHelper.getFetchTime()
         return currentTime - lastUpdateTime > refreshTime
+    }
+
+    private fun checkIsLastFetchFromDifferentCountry(): Boolean {
+        val lastFetchCountryId = sharedPreferencesHelper.getLastFetchedCountryId()
+        val isDifferent = selectedCountry.value?.id != lastFetchCountryId
+        if (isDifferent)
+            selectedCountry.value?.id?.let { sharedPreferencesHelper.saveLastFetchedCountryId(it) }
+        return isDifferent
     }
 
     private fun getCountryCodeFromLocation(context: Context, latLang: Pair<Double, Double>): String  {  //Todo: add position

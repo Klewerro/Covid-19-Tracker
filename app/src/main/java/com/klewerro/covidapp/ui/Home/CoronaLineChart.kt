@@ -37,7 +37,6 @@ class CoronaLineChart(context: Context, attrs: AttributeSet) : LineChart(context
         axisRight.isDrawBottomYLabelEntryEnabled
 
         // set onClick marker
-        setupOnClickMarker()
     }
 
     fun setLineDataSet(timelineDataList: List<TimelineAbstract>) {
@@ -56,11 +55,19 @@ class CoronaLineChart(context: Context, attrs: AttributeSet) : LineChart(context
 
         val lineData = LineData(lineDataSet1)
         val dates = timelineDataList.map { it.date }
+        setupOnClickMarker(dates)
 
         this.data = lineData
         this.xAxis.valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                val date = dates[value.roundToInt()]
+                var intValue = value.roundToInt()
+                if (intValue > dates.size) {
+                    //Sometimes after resize graph asking for outOfBound position value.
+                    //This is just for prevent IndexOutOfBound crash
+                    intValue = dates.size - 1
+                }
+
+                val date = dates[intValue]
                 val formatter = SimpleDateFormat("dd.MM")
                 return formatter.format(date)
             }
@@ -79,8 +86,8 @@ class CoronaLineChart(context: Context, attrs: AttributeSet) : LineChart(context
     }
 
 
-    private fun setupOnClickMarker() {
-        val mv = CustomMarkerView(context, R.layout.custom_marker_view)
+    private fun setupOnClickMarker(dates: List<Date?>) {
+        val mv = CustomMarkerView(context, R.layout.custom_marker_view, dates)
         mv.chartView = this
         this.marker = mv
     }
