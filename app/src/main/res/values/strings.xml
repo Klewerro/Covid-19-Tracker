@@ -11,4 +11,6 @@
     <string name="refreshing_widget_error">Refreshing widget error</string>
     <string name="confirmed">confirmed</string>
     <string name="deaths">deaths</string>
+    <string name="total_number_of_confirmed_cases">Total number of confirmed cases</string>
+    <string name="daily_new_cases">Daily new cases</string>
 </resources>

@@ -102,7 +102,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 if (index != null) {
                     countriesSpinner.setSelection(index)
                     viewModel.getCountryDataWithTimeline(country.code)
-                    showToast("Determined country: ${country.name}")
+                    //showToast("Determined country: ${country.name}")
                 }
             }
         }

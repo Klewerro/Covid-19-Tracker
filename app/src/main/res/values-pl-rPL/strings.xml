@@ -12,4 +12,6 @@
     <string name="confirmed">potwierdzone</string>
     <string name="deaths">zgony</string>
     <string name="refreshing_widget_error">Błąd przy odświeżaniu widgetu</string>
+    <string name="total_number_of_confirmed_cases">Ogólna liczba potwierdzonych przypadków</string>
+    <string name="daily_new_cases">Dzienna ilość nowych przypadków</string>
 </resources>
