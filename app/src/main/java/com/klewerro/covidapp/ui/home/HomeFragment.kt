@@ -1,4 +1,4 @@
-package com.klewerro.covidapp.ui.Home
+package com.klewerro.covidapp.ui.home
 
 import android.Manifest
 import android.content.Intent
@@ -12,10 +12,10 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import com.klewerro.covidapp.R
 import com.klewerro.covidapp.TodayStatisticsWidget
 import com.klewerro.covidapp.ui.checkPermissions
-import com.klewerro.covidapp.ui.showToast
 import com.klewerro.covidapp.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -41,6 +41,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {
             }
+        }
+
+        detailsButton.setOnClickListener {
+            it.findNavController().navigate(R.id.action_homeFragment_to_detailsFragment)
         }
     }
 

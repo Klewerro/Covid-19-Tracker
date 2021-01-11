@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.klewerro.covidapp.R
-import com.klewerro.covidapp.ui.Home.HomeFragment
+import com.klewerro.covidapp.ui.home.HomeFragment
 
 
 fun Fragment.showToast(message: String) =

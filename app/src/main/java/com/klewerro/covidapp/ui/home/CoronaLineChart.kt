@@ -1,4 +1,4 @@
-package com.klewerro.covidapp.ui.Home
+package com.klewerro.covidapp.ui.home
 
 import android.content.Context
 import android.util.AttributeSet
