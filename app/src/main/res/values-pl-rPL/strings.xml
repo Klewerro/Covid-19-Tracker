@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CovidApp</string>
+    <string name="details">Detale</string>
     <string name="hello_blank_fragment">Cześć z pustego fragmentu</string>
     <string name="location_permission_required_description">Uprawnienie do lokalizacji jest wymagane do ustalenia kraju w którym się znajdujesz.</string>
     <string name="permission_required">Wymagane uprawnienie</string>

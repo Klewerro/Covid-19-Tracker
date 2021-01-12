@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/gray"
+    android:layout_marginHorizontal="3dp">
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="2">
+
+
+        <TextView
+            android:id="@+id/itemDateTextView"
+            android:padding="5dp"
+            android:text="01.02.2020"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:layout_columnSpan="2"/>
+
+        <TextView
+            android:id="@+id/itemConfirmedTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="confirmed" />
+
+        <TextView
+            android:id="@+id/itemNewConfirmedTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="confirmed" />
+
+        <TextView
+            android:id="@+id/itemDeathsTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="deaths" />
+
+        <TextView
+            android:id="@+id/itemNewDeathsTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="deaths" />
+
+        <TextView
+            android:id="@+id/itemActiveTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="active" />
+
+        <TextView
+            android:id="@+id/itemNewActiveTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="active" />
+
+        <TextView
+            android:id="@+id/itemRecoveredTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="recovered" />
+
+        <TextView
+            android:id="@+id/itemNewRecoveredTextView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="recovered" />
+
+        <TextView
+            android:id="@+id/itemIsInProgressTextView"
+            android:padding="5dp"
+            android:text="YES"
+            android:layout_gravity="center"
+            android:layout_columnSpan="2"/>
+    </GridLayout>
+</androidx.cardview.widget.CardView>
