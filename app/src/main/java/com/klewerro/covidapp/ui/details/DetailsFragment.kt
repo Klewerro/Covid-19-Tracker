@@ -30,7 +30,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
 
         viewModel.countryDataWithTimeline.observe(viewLifecycleOwner) { countryDataWithTimeline ->
             setupRecyclerView(countryDataWithTimeline.timelineData)
-            setFragmentTitle("${countryDataWithTimeline.countryData.name} ${requireContext().getString(R.string.details)}")
+            setFragmentTitle(requireContext().getString(R.string.details, countryDataWithTimeline.countryData.name))
             chart.setLineDataSet(countryDataWithTimeline.timelineData.reversed())
         }
     }

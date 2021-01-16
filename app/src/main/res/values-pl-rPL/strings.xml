@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CovidApp</string>
-    <string name="details">Detale</string>
+    <string name="details">Detale %1$s</string>
     <string name="hello_blank_fragment">Cześć z pustego fragmentu</string>
     <string name="location_permission_required_description">Uprawnienie do lokalizacji jest wymagane do ustalenia kraju w którym się znajdujesz.</string>
     <string name="permission_required">Wymagane uprawnienie</string>
@@ -16,4 +16,7 @@
     <string name="total_number_of_confirmed_cases">Ogólna liczba potwierdzonych przypadków</string>
     <string name="daily_new_cases">Dzienna ilość nowych przypadków</string>
     <string name="more_details">Więcej szczegółów</string>
+    <string name="date">data</string>
+    <string name="active">aktywni</string>
+    <string name="recovered">ozdrowiali</string>
 </resources>

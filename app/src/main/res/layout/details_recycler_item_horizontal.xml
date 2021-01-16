@@ -104,7 +104,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="5dp"
-                android:text="active"
                 android:textColor="@color/text_active"/>
         </LinearLayout>
 
