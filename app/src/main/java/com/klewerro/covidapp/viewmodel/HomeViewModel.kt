@@ -103,6 +103,9 @@ class HomeViewModel @ViewModelInject constructor(
     private fun checkIsTimeForFetch(): Boolean {
         val currentTime = System.nanoTime()
         lastUpdateTime = sharedPreferencesHelper.getFetchTime()
+        if (lastUpdateTime == -1L)
+            return true
+
         return currentTime - lastUpdateTime > refreshTime
     }
 
