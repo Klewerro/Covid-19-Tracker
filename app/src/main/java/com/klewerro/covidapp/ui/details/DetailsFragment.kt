@@ -6,13 +6,18 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.klewerro.covidapp.R
 import com.klewerro.covidapp.data.entity.TimelineData
+import com.klewerro.covidapp.util.MetricsUtil
 import com.klewerro.covidapp.util.setFragmentTitle
 import com.klewerro.covidapp.viewmodel.DetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_details.*
 import kotlinx.android.synthetic.main.fragment_details.chart
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class DetailsFragment : Fragment(R.layout.fragment_details) {
@@ -23,10 +28,23 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         super.onCreate(savedInstanceState)
         setupChartNavigationTransition()
     }
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         timelineRecyclerView.animate().translationY(0f)
+
+        chart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+            override fun onValueSelected(e: Entry?, h: Highlight?) {
+                if (e != null) {
+                    val index = viewModel.getChartSelectedTimelineDataIndex(e.x.toInt()) ?: return
+                    val pixels = MetricsUtil.convertDpToPixel(65F, requireContext())
+                    (timelineRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(index, pixels.roundToInt())
+                }
+            }
+
+            override fun onNothingSelected() {
+            }
+        })
 
         viewModel.countryDataWithTimeline.observe(viewLifecycleOwner) { countryDataWithTimeline ->
             setupRecyclerView(countryDataWithTimeline.timelineData)

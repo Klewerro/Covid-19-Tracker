@@ -9,4 +9,14 @@ class DetailsViewModel @ViewModelInject constructor(private val repository: Covi
     val countryDataWithTimeline = repository.countryDataWithTimeline
 
 
+    fun getChartSelectedTimelineDataIndex(xPosition: Int): Int? {
+        return countryDataWithTimeline.value?.let {
+            val timelineData = it.timelineData[xPosition]
+            timelineData.id
+
+            val nOfElements = it.timelineData.size
+            nOfElements - xPosition
+        }
+    }
+
 }
