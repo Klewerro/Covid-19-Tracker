@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.klewerro.covidapp.R
 import com.klewerro.covidapp.TodayStatisticsWidget
 import com.klewerro.covidapp.ui.checkPermissions
@@ -44,7 +45,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
         detailsButton.setOnClickListener {
-            it.findNavController().navigate(R.id.action_homeFragment_to_detailsFragment)
+            val extras = FragmentNavigatorExtras(chart to "graph_transition_details")
+            it.findNavController().navigate(
+                R.id.action_homeFragment_to_detailsFragment,
+                null,
+                null,
+                extras
+            )
         }
     }
 
@@ -83,6 +90,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             chart.setLineDataSet(countryData.timelineData.reversed())
 
             viewModel.getDailyCasesFromTimelineData(countryData.timelineData)
+            detailsButton.isEnabled = true
             sendUpdateWidgetsBroadcast()
         }
 
