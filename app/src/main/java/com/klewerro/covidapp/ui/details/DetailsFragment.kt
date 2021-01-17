@@ -2,6 +2,9 @@ package com.klewerro.covidapp.ui.details
 
 import android.os.Bundle
 import android.transition.TransitionInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -31,10 +34,14 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         timelineRecyclerView.animate().translationY(0f)
 
         chart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onValueSelected(e: Entry?, h: Highlight?) {
+                if(viewModel.isAutoScrollEnabled.value == false)
+                    return
+
                 if (e != null) {
                     val index = viewModel.getChartSelectedTimelineDataIndex(e.x.toInt()) ?: return
                     val pixels = MetricsUtil.convertDpToPixel(65F, requireContext())
@@ -58,6 +65,24 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         timelineRecyclerView.animate().translationY(400f)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.details_menu, menu)
+
+        val autoScrollMenuItem = menu.getItem(0)
+        viewModel.isAutoScrollEnabled.observe(viewLifecycleOwner) {
+            autoScrollMenuItem.isChecked = it
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.menu_auto_scroll -> {
+                viewModel.setAutoScroll(!item.isChecked)
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 
     private fun setupChartNavigationTransition() {
         val animation = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)

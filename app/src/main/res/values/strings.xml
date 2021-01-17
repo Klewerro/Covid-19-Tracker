@@ -18,4 +18,5 @@
     <string name="date">date</string>
     <string name="active">active</string>
     <string name="recovered">recovered</string>
+    <string name="scroll_automatically">Scroll automatically</string>
 </resources>

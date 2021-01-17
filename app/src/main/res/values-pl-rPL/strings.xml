@@ -19,4 +19,5 @@
     <string name="date">data</string>
     <string name="active">aktywni</string>
     <string name="recovered">ozdrowiali</string>
+    <string name="scroll_automatically">Przewijaj automatycznie</string>
 </resources>

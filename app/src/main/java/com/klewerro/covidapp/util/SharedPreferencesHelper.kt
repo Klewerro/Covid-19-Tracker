@@ -9,4 +9,6 @@ interface SharedPreferencesHelper {
     fun getCountryId(): Int
     fun saveWidgetCountry(widgetId: Int, countryCode: String)
     fun getWidgetCountry(widgetId: Int): String?
+    fun saveDetailsAutoScroll(value: Boolean)
+    fun getDetailsAutoScroll(): Boolean
 }
